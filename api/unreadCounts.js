@@ -1,7 +1,8 @@
-const express = require("express");
-const { getUnreadCounts } = require("../controllers/unreadCountsController");
+const express = require('express');
+const { getUnreadCounts } = require('../controllers/unreadCountsController');
+
 const router = express.Router();
 
-router.get("/:userId", (req, res) => getUnreadCounts(req, res));
+router.get('/:userId', getUnreadCounts);
 
 module.exports = router;
