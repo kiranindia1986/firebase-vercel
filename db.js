@@ -1,21 +1,31 @@
 const admin = require("firebase-admin");
-const dotenv = require("dotenv");
+require("dotenv").config(); // Load environment variables
 
-dotenv.config();
-
+// 🔹 Ensure FIREBASE_SERVICE_ACCOUNT is set
 if (!process.env.FIREBASE_SERVICE_ACCOUNT) {
-    console.error("❌ FIREBASE_SERVICE_ACCOUNT is missing in .env file");
+    console.error("❌ FIREBASE_SERVICE_ACCOUNT is missing in .env!");
     process.exit(1);
 }
 
-const decodedServiceAccount = Buffer.from(process.env.FIREBASE_SERVICE_ACCOUNT, "base64").toString("utf-8");
+// ✅ Decode the Base64 string before parsing
+const decodedServiceAccount = Buffer.from(process.env.FIREBASE_SERVICE_ACCOUNT, 'base64').toString('utf-8');
 
-const serviceAccount = JSON.parse(decodedServiceAccount);
+// ✅ Parse the JSON
+let serviceAccount;
+try {
+    serviceAccount = JSON.parse(decodedServiceAccount);
+} catch (error) {
+    console.error("❌ Error parsing Firebase Service Account JSON:", error);
+    process.exit(1);
+}
 
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-});
+// ✅ Initialize Firebase Admin SDK
+if (!admin.apps.length) {
+    admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+    });
+}
 
 const db = admin.firestore();
-
+console.log("✅ Firestore initialized successfully!");
 module.exports = db;
