@@ -1,38 +1,24 @@
-require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const admin = require("firebase-admin");
+const dotenv = require("dotenv");
+const db = require("./db"); // Import Firestore instance
+const unreadCountsRoutes = require("./api/unreadCounts"); // Import route
 
-// Initialize Firebase
-const serviceAccount = JSON.parse(process.env.FIREBASE_CONFIG);
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-});
-
-const db = admin.firestore();
+dotenv.config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Test API Route
+// ✅ Root Route Test
 app.get("/", (req, res) => {
-    res.send("🔥 Firebase Node.js API is running!");
+    res.send("Server is running...");
 });
 
-// Sample API to fetch users from Firestore
-app.get("/users", async (req, res) => {
-    try {
-        const snapshot = await db.collection("users").get();
-        const users = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        res.json(users);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
+// ✅ Mount API Routes
+app.use("/api/unreadCounts", unreadCountsRoutes); // Ensure this line is correct
 
-// Start Server Locally
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
+    console.log(`🚀 Server running on port ${PORT}`);
 });
